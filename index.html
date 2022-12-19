@@ -120,24 +120,12 @@
         },
       };
 
-      var rewardedAdvConfig =
-      {
-        sources: [str 'admanSource,admanagerSource' | 'admanSource' | 'admanagerSource'],
-        interstitial: false
-      }
-
-      var interstitialAdvConfig =
-      {
-        sources: [str 'admanSource,admanagerSource' | 'admanSource' | 'admanagerSource'],
-        interstitial: true
-      }
-
       function showRewardedAdv(){
         showAds(rewardedAdvConfig);
       }
 
       function showInterstitialAdv(){
-        showAds(interstitialAdvConfig);
+        console.log('showInterstitialAdv');
       }
 
     (function apiHandshake(iframeApi) {
