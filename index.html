@@ -107,7 +107,7 @@
     <script>
 
 
-    console.log('Try: 3');
+    console.log('Try: 4');
 
     (function apiHandshake(iframeApi) {
         if (typeof iframeApi === 'undefined') {
@@ -118,8 +118,22 @@
         var externalApi = null;
 
         var callbacks = {
-            appid: 20259,
+          appid: 20259,
 
+          getLoginStatusCallback: function(status) {},
+          userInfoCallback: function(info) {},
+          userProfileCallback: function(profile) {},
+          registerUserCallback: function(info) {},
+          paymentFrameUrlCallback: function(url) {},
+          getAuthTokenCallback: function(token) {},
+          paymentReceivedCallback: function(data) {},
+          paymentWindowClosedCallback: function() {},
+          userConfirmCallback: function() {},
+          adsCallback: function(context) {
+            if (context == 'adCompleted'){
+              console.log('REklama pokazana');
+            }
+          },
         };
 
 
@@ -129,6 +143,26 @@
 
         function connected(api) {
             externalApi = api;
+        }
+
+        var rewardedAdvConfig =
+        {
+          sources: [str 'admanSource,admanagerSource' | 'admanSource' | 'admanagerSource'],
+          interstitial: false
+        }
+
+        var interstitialAdvConfig =
+        {
+          sources: [str 'admanSource,admanagerSource' | 'admanSource' | 'admanagerSource'],
+          interstitial: true
+        }
+
+        function showRewardedAdv(){
+          showAds(rewardedAdvConfig);
+        }
+
+        function showInterstitialAdv(){
+          showAds(interstitialAdvConfig);
         }
 
         iframeApi(callbacks).then(connected, error);
