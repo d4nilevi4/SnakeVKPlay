@@ -107,7 +107,7 @@
     <script>
 
 
-    console.log('Try: 2');
+    console.log('Try: 3');
 
     (function apiHandshake(iframeApi) {
         if (typeof iframeApi === 'undefined') {
@@ -116,6 +116,12 @@
         }
 
         var externalApi = null;
+
+        var callbacks = {
+            appid: 20259,
+
+        };
+
 
         function error(err) {
             throw new Error('Could not init external api ' + err);
