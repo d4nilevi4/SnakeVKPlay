@@ -105,6 +105,10 @@
     <script type="text/javascript" src="//vkplay.ru/app/20259/static/mailru.core.js"></script>
 
     <script>
+
+
+      console.log('Try: 1');
+
     (function apiHandshake(iframeApi) {
         if (typeof iframeApi === 'undefined') {
             console.log('Cannot find iframeApi function, are we inside an iframe?');
@@ -112,22 +116,6 @@
         }
 
         var externalApi = null;
-
-        var callbacks = {
-            appid: 20259,
-
-            getLoginStatusCallback: function(status) {},
-            userInfoCallback: function(info) {},
-            userProfileCallback: function(profile) {},
-            registerUserCallback: function(info) {},
-            paymentFrameUrlCallback: function(url) {},
-            getAuthTokenCallback: function(token) {},
-            paymentReceivedCallback: function(data) {},
-            paymentWindowClosedCallback: function() {},
-            userConfirmCallback: function() {},
-            paymentFrameItem(object args,
-            getGameInventoryItems()
-        };
 
         function error(err) {
             throw new Error('Could not init external api ' + err);
