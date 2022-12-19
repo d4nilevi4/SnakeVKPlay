@@ -118,16 +118,7 @@
         var callbacks = {
           appid: 20259,
 
-          getLoginStatusCallback: function(status) {},
-          userInfoCallback: function(info) {},
-          userProfileCallback: function(profile) {},
-          registerUserCallback: function(info) {},
-          paymentFrameUrlCallback: function(url) {},
-          getAuthTokenCallback: function(token) {},
-          paymentReceivedCallback: function(data) {},
-          paymentWindowClosedCallback: function() {},
-          userConfirmCallback: function() {},
-          getGameInventoryItems() {},
+          adsCallback: function(context) {},
           };
 
           function error(err) {
@@ -138,23 +129,12 @@
             externalApi = api;
           }
 
-        // пример вызова действия "Регистрация"
-        $('#register').on('click', function(e) {
-          e.preventDefault();
-          externalApi.registerUser();
-        });
+          config =
+          {
+            interstitial: false
+          }
 
-        // пример вызова действия "Вход"
-        $('#auth').on('click', function(e) {
-          e.preventDefault();
-          externalApi.authUser();
-        });
-
-        // пример получения профиля
-        $('#profile').on('click', function(e) {
-          e.preventDefault();
-          externalApi.userProfile();
-        });
+          showAds(config);
 
         iframeApi(callbacks).then(connected, error);
       }(window.iframeApi));
