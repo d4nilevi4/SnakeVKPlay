@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Unity WebGL Player | Snake</title>
+  <title>Unity WebGL Player | Don't touch yhe spikes</title>
   <link rel="shortcut icon" href="TemplateData/favicon.ico">
   <link rel="stylesheet" href="TemplateData/style.css">
 </head>
 <body>
-  <div id="unity-container" style="position: absolute; width: 100%; height: 100%; left: 0%; top: 0%;">
+  <div id="unity-container" style="position: absolute; width: 100%; height: 100%">
     <canvas id="unity-canvas" style="position: absolute; width: 100%; height: 100%"></canvas>
     <div id="unity-loading-bar">
       <div id="unity-logo"></div>
@@ -51,14 +51,14 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/SnakeVKPlay.loader.js";
+      var loaderUrl = buildUrl + "/BirdMailPlay.loader.js";
       var config = {
-        dataUrl: buildUrl + "/SnakeVKPlay.data",
-        frameworkUrl: buildUrl + "/SnakeVKPlay.framework.js",
-        codeUrl: buildUrl + "/SnakeVKPlay.wasm",
+        dataUrl: buildUrl + "/BirdMailPlay.data",
+        frameworkUrl: buildUrl + "/BirdMailPlay.framework.js",
+        codeUrl: buildUrl + "/BirdMailPlay.wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
-        productName: "Snake",
+        productName: "Don't touch yhe spikes",
         productVersion: "1.0",
         showBanner: unityShowBanner,
       };
@@ -76,8 +76,14 @@
         // and default/override low DPI mode on mobile browsers.
         config.devicePixelRatio = 1;
       } else {
-        canvas.style.width = "100%";
+        container.className = "unity-desktop";
         canvas.style.height = "100%";
+        canvas.style.width = "100%";
+
+        const screenHeight = window.screen.height;
+        const screenWidth = window.screen.width;
+
+        container.style.width = 56.25 * screenHeight / screenWidth + "%";
       }
       loadingBar.style.display = "block";
 
@@ -90,9 +96,6 @@
         }).then((unityInstance) => {
           unityI = unityInstance;
           loadingBar.style.display = "none";
-          //fullscreenButton.onclick = () => {
-           // unityInstance.SetFullscreen(1);
-          //};
         }).catch((message) => {
           alert(message);
         });
@@ -100,64 +103,62 @@
       document.body.appendChild(script);
     </script>
 
-    <!-- VK Games -->
-
-    <script type="text/javascript" src="//vkplay.ru/app/20259/static/mailru.core.js"></script>
+    <!-- VK Play SDK -->
+    <script type="text/javascript" src="//vkplay.ru/app/20540/static/mailru.core.js"></script>
 
     <script>
-    (function apiHandshake(iframeApi) {
+
+      var vkApi;
+
+      var config = {
+        interstitial: true,
+      }
+
+      var callbacks = {
+        appid: 20540,
+
+        getLoginStatusCallback: function(status) {},
+        userInfoCallback: function(info) {},
+        userProfileCallback: function(profile) {},
+        registerUserCallback: function(info) {},
+        paymentFrameUrlCallback: function(url) {},
+        getAuthTokenCallback: function(token) {},
+        paymentReceivedCallback: function(data) {},
+        paymentWindowClosedCallback: function() {},
+        userConfirmCallback: function() {},
+        paymentFrameItem: function(args){},
+        getGameInventoryItems: function(){},
+
+        adsCallback: function(context) {
+          console.log( 'adsCallback', context )
+          play_level( get_ads_num() )
+        },
+      }
+
+      function apiHandshake(iframeApi) {
+
         if (typeof iframeApi === 'undefined') {
             console.log('Cannot find iframeApi function, are we inside an iframe?');
             return;
         }
 
-        var externalApi = null;
-
-        var callbacks = {
-            appid: 20259,
-
-            getLoginStatusCallback: function(status) {},
-            userInfoCallback: function(info) {},
-            userProfileCallback: function(profile) {},
-            registerUserCallback: function(info) {},
-            paymentFrameUrlCallback: function(url) {},
-            getAuthTokenCallback: function(token) {},
-            paymentReceivedCallback: function(data) {},
-            paymentWindowClosedCallback: function() {},
-            userConfirmCallback: function() {},
-            paymentFrameItem(object args,
-            getGameInventoryItems()
-        };
-
         function error(err) {
+            console.log( 'error', err )
             throw new Error('Could not init external api ' + err);
         }
 
         function connected(api) {
+            console.log( 'API connected' )
             externalApi = api;
+            vkApi = externalApi;
         }
 
-        // пример вызова действия "Регистрация"
-        $('#register').on('click', function(e) {
-            e.preventDefault();
-            externalApi.registerUser();
-        });
+        console.log( 'apiHandshake' )
+        iframeApi( callbacks ).then(connected, error);
+      }
+      apiHandshake( iframeApi )
+    
+    </script>
 
-        // пример вызова действия "Вход"
-        $('#auth').on('click', function(e) {
-            e.preventDefault();
-            externalApi.authUser();
-        });
-
-        // пример получения профиля
-        $('#profile').on('click', function(e) {
-            e.preventDefault();
-            externalApi.userProfile();
-        });
-
-        iframeApi(callbacks).then(connected, error);
-    }(window.iframeApi));
-</script>
-
-</body>
+  </body>
 </html>
