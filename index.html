@@ -6,6 +6,94 @@
   <title>Unity WebGL Player | Snake</title>
   <link rel="shortcut icon" href="TemplateData/favicon.ico">
   <link rel="stylesheet" href="TemplateData/style.css">
+  <script type="text/javascript" src="//vkplay.ru/app/20259/static/mailru.core.js"></script>
+  <script type="text/javascript">
+      (function apiHandshake(iframeApi) {
+        if (typeof iframeApi === 'undefined') {
+          console.log('Cannot find iframeApi function, are we inside an iframe?');
+          return;
+        }
+
+        var config = {
+          interstitial: true,
+        }
+
+        var rewardedConfig = {
+          interstitial: false,
+        }
+
+        var externalApi = null;
+
+        var callbacks = {
+          appid: 20259,
+
+          getLoginStatusCallback: function(status) {
+            window.getLoginStatusCallback(status)
+          },
+          userInfoCallback: function(info) {
+            window.userInfoCallback(info)
+          },
+          userProfileCallback: function(profile) {},
+          registerUserCallback: function(info) {
+            window.reloadWindow()
+          },
+          paymentFrameUrlCallback: function(url) {},
+          getAuthTokenCallback: function(token) {},
+          paymentReceivedCallback: function(data) {},
+          paymentWindowClosedCallback: function() {},
+          userConfirmCallback: function() {},
+          adsCallback: function(context) {
+            window.adsCallback(context)
+          },
+        };
+
+        function error(err) {
+          throw new Error('Could not init external api ' + err);
+        }
+
+        function connected(api) {
+          console.log('connected!')
+          externalApi = api;
+        }
+
+        iframeApi(callbacks).then(connected, error);
+
+        window.showRewardedAds = function() {
+          console.log('showAds invoked')
+          externalApi?.showAds(rewardedConfig);
+        };
+
+        window.showAds = function() {
+          console.log('showAds invoked')
+          externalApi?.showAds(config);
+        };
+
+        window.getLoginStatus = function() {
+          console.log('getLoginStatus invoked');
+          externalApi?.getLoginStatus();
+        };
+
+        window.authUser = function() {
+          console.log('authUser invoked');
+          externalApi?.authUser();
+        };
+
+        window.registerUser = function() {
+          console.log('registerUser invoked');
+          externalApi?.registerUser();
+        }
+
+        window.userInfo = function() {
+          console.log('userInfo invoked')
+          externalApi?.userInfo();
+        }
+
+        window.reloadWindow = function() {
+          console.log('reloadWindow invoked')
+          externalApi?.reloadWindow()
+        }
+      }(window.iframeApi));
+    </script>
 </head>
 <body>
   <div id="unity-container" style="position: absolute; width: 100%; height: 100%; left: 0%; top: 0%;">
@@ -74,7 +162,8 @@
         container.className = "unity-mobile";
         // Avoid draining fillrate performance on mobile devices,
         // and default/override low DPI mode on mobile browsers.
-        config.devicePixelRatio = 1;
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
       } else {
         canvas.style.width = "100%";
         canvas.style.height = "100%";
@@ -82,80 +171,50 @@
       loadingBar.style.display = "block";
 
       var script = document.createElement("script");
-      var unityI = null;
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
-          unityI = unityInstance;
+          window.unityInstance = unityInstance;
           loadingBar.style.display = "none";
-          //fullscreenButton.onclick = () => {
-           // unityInstance.SetFullscreen(1);
-          //};
+
+          window.adsCallback = function(context) {
+            t = context.type
+            if (t === undefined)
+              t = 'adError'
+            console.log(t)
+            c = context.code
+            if (c === undefined)
+              c = 'adInternalError'
+            console.log(c)
+            unityInstance.SendMessage('VKSDK', 'AdsCallback', t, c)
+          }
+
+          /*window.getLoginStatusCallback = function(status) {
+            console.log('getLoginStatusCallback invoked with status: ' + JSON.stringify(status));
+            if (status.status === 'ok')
+              unityInstance.SendMessage('GAME_MANAGER', 'GetLoginStatusCallback_Ok', status.loginStatus)
+            else if (status.status === 'error')
+              unityInstance.SendMessage('GAME_MANAGER', 'GetLoginStatusCallback_Error', status.errcode, status.errmsg)
+            else
+              console.log('Undefined status.status: ' + status.status)
+          }
+
+          window.userInfoCallback = function(status) {
+            console.log('userInfoCallback invoked with status: ' + JSON.stringify(status));
+            if (status.status === 'ok')
+              unityInstance.SendMessage('GAME_MANAGER', 'UserInfoCallback_Ok', parseInt(status.uid))
+            else if (status.status === 'error')
+              unityInstance.SendMessage('GAME_MANAGER', 'UserInfoCallback_Error', status.errcode, status.errmsg)
+            else
+              console.log('Undefined status.status: ' + status.status)
+          }*/
         }).catch((message) => {
           alert(message);
         });
       };
       document.body.appendChild(script);
     </script>
-
-    <!-- VK Games -->
-
-    <script type="text/javascript" src="//vkplay.ru/app/20259/static/mailru.core.js"></script>
-
-    <script>
-    (function apiHandshake(iframeApi) {
-        if (typeof iframeApi === 'undefined') {
-            console.log('Cannot find iframeApi function, are we inside an iframe?');
-            return;
-        }
-
-        var externalApi = null;
-
-        var callbacks = {
-            appid: 20259,
-
-            getLoginStatusCallback: function(status) {},
-            userInfoCallback: function(info) {},
-            userProfileCallback: function(profile) {},
-            registerUserCallback: function(info) {},
-            paymentFrameUrlCallback: function(url) {},
-            getAuthTokenCallback: function(token) {},
-            paymentReceivedCallback: function(data) {},
-            paymentWindowClosedCallback: function() {},
-            userConfirmCallback: function() {}
-        };
-
-        function error(err) {
-            throw new Error('Could not init external api ' + err);
-        }
-
-        function connected(api) {
-            externalApi = api;
-        }
-
-        // пример вызова действия "Регистрация"
-        $('#register').on('click', function(e) {
-            e.preventDefault();
-            externalApi.registerUser();
-        });
-
-        // пример вызова действия "Вход"
-        $('#auth').on('click', function(e) {
-            e.preventDefault();
-            externalApi.authUser();
-        });
-
-        // пример получения профиля
-        $('#profile').on('click', function(e) {
-            e.preventDefault();
-            externalApi.userProfile();
-        });
-
-        iframeApi(callbacks).then(connected, error);
-    }(window.iframeApi));
-</script>
-
 </body>
 </html>
