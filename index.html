@@ -189,8 +189,10 @@
               c = 'adInternalError'
             console.log(c)
 
-            if (t === 'adCompleted')
+            if (t === 'adCompleted'){
+            	console.log('adCompleted');
               unityInstance.SendMessage('VKSDK', 'OnRewardGet')
+            }
 
             //unityInstance.SendMessage('VKSDK', 'AdsCallback', t, c)
           }
